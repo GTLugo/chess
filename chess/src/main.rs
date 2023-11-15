@@ -3,9 +3,6 @@
 use bevy::{prelude::*, window::PresentMode, log::LogPlugin, core::FrameCount};
 use tracing::Level;
 
-#[derive(Component)]
-struct Sun;
-
 const DEFAULT_WINDOW_SIZE: (f32, f32) = (500., 450.);
 
 fn main() {
