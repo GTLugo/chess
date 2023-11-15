@@ -15,6 +15,11 @@ fn main() {
           title: "Chess".into(),
           resolution: DEFAULT_WINDOW_SIZE.into(),
           present_mode: PresentMode::AutoVsync,
+          resizable: false, // disable resizing for now, as it will need to be handled differently for sprites because i'm not smart enough
+          enabled_buttons: bevy::window::EnabledButtons {
+            maximize: false,
+            ..Default::default()
+          },
           ..default()
         }),
         ..default()
