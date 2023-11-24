@@ -88,28 +88,16 @@ fn create_board(
     ..Default::default()
   });
 
-  // let letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'k', 'l'];
-
-  let mut first_letter = 1;
-  let mut last_letter = 11;
+  let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L']; // hex chess conventionally skips 'J' for some strange reason
   for number in 1..=11 {
-    first_letter = match number {
-      _ if number <= 6 => 1,
-      _ => first_letter + 1,
-    };
-    last_letter = match number {
-      _ if number <= 6 => 11,
-      _ => last_letter - 1,
-    };
+    let first_letter = if number <= 6 { 0 } else { number - 6 };
+    let last_letter = if number <= 6 { letters.len() } else { letters.len() - (number - 6) };
 
-    let mut current_letter = first_letter;
-    while current_letter <= last_letter {
-      // print!("{}{}, ", letters[current_letter - 1], number);
-      current_letter += 1;
+    for letter in &letters[first_letter..last_letter] {
+      print!("{}{}, ", letter, number);
     }
-    // println!();
+    println!();
   }
-
 
   for (rank, file) in itertools::iproduct!(0..8, 0..8) {
     let position = Vec3::new((rank as f32 * size) - offset, (file as f32 * size) - offset, 0.);
