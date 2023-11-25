@@ -90,10 +90,13 @@ fn create_board(
 
   let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L']; // hex chess conventionally skips 'J' for some strange reason
   for number in 1..=11 {
-    let first_letter = if number <= 6 { 0 } else { number - 6 };
-    let last_letter = if number <= 6 { letters.len() } else { letters.len() - (number - 6) };
+    let range = if number <= 6 { 
+      0..letters.len()
+    } else {
+      (number - 6)..(letters.len() - (number - 6))
+    };
 
-    for letter in &letters[first_letter..last_letter] {
+    for letter in &letters[range] {
       print!("{}{}, ", letter, number);
     }
     println!();
