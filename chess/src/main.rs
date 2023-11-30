@@ -1,11 +1,12 @@
 #![cfg_attr(all(windows, not(debug_assertions)), windows_subsystem = "windows")]
 
-use bevy::{prelude::*, window::PresentMode, log::LogPlugin, core::FrameCount, sprite::MaterialMesh2dBundle};
+use bevy::{prelude::*, window::PresentMode, log::LogPlugin, core::FrameCount, sprite::{MaterialMesh2dBundle, Mesh2d, Mesh2dHandle}};
 use tracing::Level;
 
 use components::*;
 
 mod components;
+mod hex;
 
 const DEFAULT_WINDOW_SIZE: (f32, f32) = (600., 500.);
 
@@ -65,10 +66,10 @@ fn create_board(
   let horiz = 3. / 2. * size;
   let vert = f32::sqrt(3.) * size;
   
-  let mesh = meshes.add(shape::RegularPolygon::new(size, 6).into()).into();
-  let white_material = materials.add(ColorMaterial::from(Color::hex("FFDBBF").unwrap()));
-  let gray_material = materials.add(ColorMaterial::from(Color::hex("C28D78").unwrap()));
-  let black_material = materials.add(ColorMaterial::from(Color::hex("784E3B").unwrap()));
+  let mesh: Mesh2dHandle = meshes.add(shape::RegularPolygon::new(size, 6).into()).into();
+  let white_material: Handle<ColorMaterial> = materials.add(ColorMaterial::from(Color::hex("FFDBBF").unwrap()));
+  let gray_material: Handle<ColorMaterial>  = materials.add(ColorMaterial::from(Color::hex("C28D78").unwrap()));
+  let black_material: Handle<ColorMaterial>  = materials.add(ColorMaterial::from(Color::hex("784E3B").unwrap()));
 
   // let size = if let Ok(window) = window_query.get_single() {
   //   50. * f32::min(window.height() / DEFAULT_WINDOW_SIZE.0, window.width() / DEFAULT_WINDOW_SIZE.1)
@@ -98,35 +99,39 @@ fn create_board(
 
     for letter in &letters[range] {
       print!("{}{}, ", letter, number);
+
+      commands.spawn((
+
+        MaterialMesh2dBundle {
+          mesh: mesh.clone(),
+          material: gray_material.clone(),
+          transform: Transform::from_translation(Vec3::new(0., 0., 1.))
+            .with_rotation(Quat::from_rotation_z(f32::to_radians(30.))),
+          ..Default::default()
+        },
+      ));
     }
     println!();
   }
 
-  for (rank, file) in itertools::iproduct!(0..8, 0..8) {
-    let position = Vec3::new((rank as f32 * size) - offset, (file as f32 * size) - offset, 0.);
-    let texture: Handle<Image> = if (rank + file) % 2 != 0 {
-      asset_server.load("tile_white.png")
-    } else {
-      asset_server.load("tile_black.png")
-    };
+  // for (rank, file) in itertools::iproduct!(0..8, 0..8) {
+  //   let position = Vec3::new((rank as f32 * size) - offset, (file as f32 * size) - offset, 0.);
+  //   let texture: Handle<Image> = if (rank + file) % 2 != 0 {
+  //     asset_server.load("tile_white.png")
+  //   } else {
+  //     asset_server.load("tile_black.png")
+  //   };
 
-    commands.spawn(SpriteBundle {
-      texture,
-      sprite: Sprite {
-        custom_size: Some((size, size).into()),
-        ..Default::default()
-      },
-      transform: Transform::from_translation(position),
-      ..Default::default()
-    });
-  }
-
-  commands.spawn(MaterialMesh2dBundle {
-    mesh,
-    material: gray_material,
-    transform: Transform::from_translation(Vec3::new(0., 0., 1.)).with_rotation(Quat::from_rotation_z(f32::to_radians(30.))),
-    ..Default::default()
-  });
+  //   commands.spawn(SpriteBundle {
+  //     texture,
+  //     sprite: Sprite {
+  //       custom_size: Some((size, size).into()),
+  //       ..Default::default()
+  //     },
+  //     transform: Transform::from_translation(position),
+  //     ..Default::default()
+  //   });
+  // }
 }
 
 fn reveal_window(
